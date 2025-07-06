@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Rotas Google Maps</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        input, select, textarea, button { width: 100%; margin-top: 10px; padding: 10px; font-size: 1rem; }
+        label { margin-top: 20px; display: block; font-weight: bold; }
+        a { display: inline-block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Gerador de Rotas Google Maps</h2>
+
+    <label for="cidade">Cidade</label>
+    <input type="text" id="cidade" placeholder="Ex: Tóquio">
+
+    <label for="partida">Ponto de partida</label>
+    <input type="text" id="partida" placeholder="Ex: Shinjuku Granbell Hotel">
+
+    <label for="pontos">Pontos turísticos (1 por linha, em ordem)</label>
+    <textarea id="pontos" rows="6" placeholder="Ex:
+Tokyo Tower
+Meiji Shrine
+Shibuya Crossing
+Imperial Palace
+Senso-ji"></textarea>
+
+    <label for="modo">Modo de transporte</label>
+    <select id="modo">
+        <option value="walking">A pé</option>
+        <option value="driving">Carro</option>
+        <option value="transit">Transporte público</option>
+    </select>
+
+    <button onclick="gerarRota()">Gerar Rota</button>
+    <a id="linkRota" href="#" target="_blank" style="display:none;">Abrir no Google Maps</a>
+
+    <script>
+        function gerarRota() {
+            const cidade = document.getElementById('cidade').value.trim().replace(/ /g, "+");
+            const partida = document.getElementById('partida').value.trim().replace(/ /g, "+") + "," + cidade;
+            const modo = document.getElementById('modo').value;
+            const pontos = document.getElementById('pontos').value.trim().split('\n').map(p => p.trim().replace(/ /g, "+") + "," + cidade);
+            
+            if (pontos.length < 1) {
+                alert("Digite ao menos 1 ponto turístico.");
+                return;
+            }
+
+            const destino = pontos[pontos.length - 1];
+            const waypoints = pontos.slice(0, -1).join("%7C"); // separa por | (URL encoded)
+
+            let url = `https://www.google.com/maps/dir/?api=1&origin=${partida}&destination=${destino}&travelmode=${modo}`;
+            if (waypoints) {
+                url += `&waypoints=${waypoints}`;
+            }
+
+            const link = document.getElementById('linkRota');
+            link.href = url;
+            link.style.display = 'inline-block';
+            link.textContent = "Abrir no Google Maps";
+        }
+    </script>
+</body>
+</html>
